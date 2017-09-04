@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:RunningApp.xcodeproj">
+      location = "self:/Users/poatek/RunningApp/MoonRunner-starter/RunningApp.xcodeproj">
    </FileRef>
 </Workspace>
