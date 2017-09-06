@@ -46,6 +46,7 @@ class RunDetailsViewController: UIViewController {
     configureView()
   }
   
+  //foramts the data to be shown in the labels and loads the run map
   private func configureView() {
     let distance = Measurement(value: run.distance, unit: UnitLength.meters)
     let seconds = Int(run.duration)
@@ -64,6 +65,7 @@ class RunDetailsViewController: UIViewController {
     loadMap()
   }
   
+  //calcualtes the region to be shown based on maximum and minimum latitude and longitude info with some added padding
   private func mapRegion() -> MKCoordinateRegion? {
     guard
       let locations = run.locations,
@@ -96,20 +98,20 @@ class RunDetailsViewController: UIViewController {
   
   private func polyLine() -> [MulticolorPolyline] {
     
-    // 1
+    //prepare to collect coordinate pairs to describe each segment and the speed for each segment
     let locations = run.locations?.array as! [Location]
     var coordinates: [(CLLocation, CLLocation)] = []
     var speeds: [Double] = []
     var minSpeed = Double.greatestFiniteMagnitude
     var maxSpeed = 0.0
     
-    // 2
+    //convert each endpoint into a CLLocation object and save them in pairs
     for (first, second) in zip(locations, locations.dropFirst()) {
       let start = CLLocation(latitude: first.latitude, longitude: first.longitude)
       let end = CLLocation(latitude: second.latitude, longitude: second.longitude)
       coordinates.append((start, end))
       
-      //3
+      //calculate the speed for the segment
       let distance = end.distance(from: start)
       let time = second.timestamp!.timeIntervalSince(first.timestamp! as Date)
       let speed = time > 0 ? distance / time : 0
@@ -118,10 +120,10 @@ class RunDetailsViewController: UIViewController {
       maxSpeed = max(maxSpeed, speed)
     }
     
-    //4
+    //calculate the average speed for the run
     let midSpeed = speeds.reduce(0, +) / Double(speeds.count)
     
-    //5
+    //use the previously prepared coordinate pairs to create a new MulticolorPolyline. Set its color
     var segments: [MulticolorPolyline] = []
     for ((start, end), speed) in zip(coordinates, speeds) {
       let coords = [start.coordinate, end.coordinate]
@@ -135,6 +137,7 @@ class RunDetailsViewController: UIViewController {
     return segments
   }
   
+  //set the map region and add the run overlay
   private func loadMap() {
     guard
       let locations = run.locations,
@@ -153,6 +156,7 @@ class RunDetailsViewController: UIViewController {
     mapView.addOverlays(polyLine())
   }
   
+  //defines base colors then creates blended colors based on where the specified speed falls in the range from slowest to fastest
   private func segmentColor(speed: Double, midSpeed: Double, slowestSpeed: Double, fastestSpeed: Double) -> UIColor {
     enum BaseColors {
       static let r_red: CGFloat = 1
@@ -187,6 +191,7 @@ class RunDetailsViewController: UIViewController {
 
 }
 
+//expect each overlay to be a MulticolorPolyline
 extension RunDetailsViewController: MKMapViewDelegate {
   func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
     guard let polyline = overlay as? MulticolorPolyline else {

@@ -1,3 +1,4 @@
+//
 /**
  * Copyright (c) 2017 Razeware LLC
  *
@@ -30,29 +31,22 @@
 
 import UIKit
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-  
-  var window: UIWindow?
-  
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-    UINavigationBar.appearance().tintColor = .white
-    UINavigationBar.appearance().barTintColor = .black
+class MusicPlayerCell: UITableViewCell {
     
-    let locationManager = LocationManager.shared
-    locationManager.requestAlwaysAuthorization()
-    locationManager.allowsBackgroundLocationUpdates = true
+    @IBOutlet weak var artwork: UIImageView!
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var detail: UILabel!
     
-    return true
-  }
-  
-  func applicationDidEnterBackground(_ application: UIApplication) {
-    CoreDataStack.saveContext()
-  }
-  
-  func applicationWillTerminate(_ application: UIApplication) {
-    CoreDataStack.saveContext()
-  }
-  
-}
 
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+    }
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        // Configure the view for the selected state
+    }
+    
+}

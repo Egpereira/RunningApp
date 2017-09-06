@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>RunningApp needs acces to your library in order to play your songs!</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>RunningApp needs access to your location in order to record and track your run!</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

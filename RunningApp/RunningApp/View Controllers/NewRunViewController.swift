@@ -66,6 +66,7 @@ class NewRunViewController: UIViewController {
   }
   
   private func startRun() {
+    //sets the UI for "during run" mode
     mapContainerView.isHidden = false
     mapView.removeOverlays(mapView.overlays)
     launchPromptStackView.isHidden = true
@@ -73,16 +74,19 @@ class NewRunViewController: UIViewController {
     startButton.isHidden = true
     stopButton.isHidden = false
     
+    //resets run related variables
     seconds = 0
     distance = Measurement(value: 0, unit: UnitLength.meters)
     locationList.removeAll()
     updateDisplay()
+    //sets timer to update the run information
     timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
       self.eachSecond()
     }
     startLocationUpdates()
   }
   
+  //sets the UI for "not running" mode and stop updating locaitions
   private func stopRun() {
     mapContainerView.isHidden = true
     launchPromptStackView.isHidden = false
@@ -92,6 +96,7 @@ class NewRunViewController: UIViewController {
     locationManager.stopUpdatingLocation()
   }
   
+  //saves the run relevant information on Core Data
   private func saveRun() {
     let newRun = Run(context: CoreDataStack.context)
     newRun.distance = distance.value
@@ -115,16 +120,21 @@ class NewRunViewController: UIViewController {
     startRun()
   }
   
+  //prompts user with options to save or discard current run information
   @IBAction func stopTapped() {
     let alertController = UIAlertController(title: "End run?",
                                             message: "Do you wish to end your run?",
                                             preferredStyle: .actionSheet)
     alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    
+    //save option stops the run, saves the info and present the run details screen
     alertController.addAction(UIAlertAction(title: "Save", style: .default) { _ in
       self.stopRun()
       self.saveRun()
       self.performSegue(withIdentifier: .details, sender: nil)
     })
+    
+    //discard option just stops the run and returns to root screen
     alertController.addAction(UIAlertAction(title: "Discard", style: .destructive) { _ in
       self.stopRun()
       _ = self.navigationController?.popToRootViewController(animated: true)
@@ -133,6 +143,7 @@ class NewRunViewController: UIViewController {
     present(alertController, animated: true)
   }
   
+  //counts run time and updates run information
   func eachSecond() {
     seconds += 1
     updateDisplay()
@@ -145,6 +156,7 @@ class NewRunViewController: UIViewController {
     locationManager.startUpdatingLocation()
   }
   
+ //updstes the display labels for run informations in the formatted layout
   private func updateDisplay() {
     let formattedDistance = FormatDisplay.distance(distance)
     let formattedTime = FormatDisplay.time(seconds)
@@ -161,6 +173,7 @@ class NewRunViewController: UIViewController {
 
 extension NewRunViewController: CLLocationManagerDelegate {
   
+  //called at every location update, but only ads the data with a certain accuracy and timestamp
   func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     for newLocation in locations {
       let howRecent = newLocation.timestamp.timeIntervalSinceNow
