@@ -48,5 +48,9 @@ class MusicPlayerCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    
+  
+//  func updateInformation(_ song: MPMediaItem) {
+//
+//  }
+  
 }

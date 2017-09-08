@@ -42,20 +42,27 @@ class MusicPlayerTableViewController: UITableViewController {
   var albums: [AlbumInfo] = []
   var songQuery: SongQuery = SongQuery()
   var audio: AVAudioPlayer?
-  var songs: [MPMediaItem] = []
+  var songs: MPMediaQuery?
+  var player = MPMusicPlayerController.applicationMusicPlayer
+  var avPlayer = AVPlayer()
   
   override func viewDidLoad() {
     
     super.viewDidLoad()
-    self.title = "Albums"
+    self.title = "Songs"
+    musicTableView.register(UINib.init(nibName: "MusicPlayerCell", bundle: Bundle.main), forCellReuseIdentifier: "MusicPlayerCell")
     MPMediaLibrary.requestAuthorization { (status) in
       if status == .authorized {
         self.albums = self.songQuery.get(songCategory: "")
-        self.songs = MPMediaQuery.songs().items!
-        print("lol1")
-        print(self.songs)
+        self.songs = MPMediaQuery.songs()
+        let mediaItems = MPMediaQuery.songs().items
+        print("songs")
+        print("albums")
         print(self.albums)
-        print("lol2")
+        //let mediaCollection = MPMediaItemCollection(items: self.songs)
+        //print(mediaCollection)
+        print(mediaItems![1].albumTitle!)
+        
         DispatchQueue.main.async {
           self.tableView?.rowHeight = UITableViewAutomaticDimension;
           self.tableView?.estimatedRowHeight = 60.0;
@@ -65,6 +72,37 @@ class MusicPlayerTableViewController: UITableViewController {
         self.displayMediaLibraryError()
       }
     }
+  }
+  
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    let mediaItem = MPMediaQuery.songs().items![1].assetURL
+    //urlAsset = AVURLAsset.init(url: mediaItem)
+//    let player = MPMusicPlayerController.systemMusicPlayer
+//    player.nowPlayingItem = mediaItems?.first
+    player.setQueue(with: MPMediaQuery.songs())
+    //print(MPMediaQuery.songs().items)
+//    print(player.nowPlayingItem)
+    //---------------------
+    //self.avPlayer = AVPlayer.init(playerItem: AVPlayerItem.init(url: mediaItem!))
+    //self.avPlayer.play()
+    
+   player.play()
+    //          player.play()
+//    print(player.nowPlayingItem)
+//    Timer.init(timeInterval: 1, target: self, selector: #selector(verifyPlayer), userInfo: nil, repeats: true).fire()
+//    Timer.init(timeInterval: 1, repeats: true) { (timer) in
+//      if (self.player.playbackState != .playing){
+//        self.player.setQueue(with: MPMediaQuery.songs())
+//        print(MPMediaQuery.songs().items)
+//        self.player.play()
+//      }
+//    }.fire()
+  }
+  
+  func verifyPlayer() {
+    
+    
   }
   
   
@@ -113,12 +151,17 @@ class MusicPlayerTableViewController: UITableViewController {
       withIdentifier: "MusicPlayerCell",
       for: indexPath) as! MusicPlayerCell
     cell.title?.text = albums[indexPath.section].songs[indexPath.row].songTitle
+    print("cell song title")
+    print(albums[indexPath.section].songs[indexPath.row].songTitle)
+    
     cell.detail?.text = albums[indexPath.section].songs[indexPath.row].artistName
+    print("cell artist name")
+    print(albums[indexPath.section].songs[indexPath.row].artistName)
     let songId: NSNumber = albums[indexPath.section].songs[indexPath.row].songId
     let item: MPMediaItem = songQuery.getItem( songId: songId )
     
     if  let imageSound: MPMediaItemArtwork = item.value( forProperty: MPMediaItemPropertyArtwork ) as? MPMediaItemArtwork {
-      //cell.imageMusic?.image = imageSound.image(at: CGSize(width: cell.imageMusic.frame.size.width, height: cell.imageMusic.frame.size.height))
+    cell.artwork?.image = imageSound.image(at: CGSize(width: cell.artwork.frame.size.width, height: cell.artwork.frame.size.height))
     }
     return cell;
   }
